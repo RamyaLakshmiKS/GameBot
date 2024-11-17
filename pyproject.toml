@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "bully-bot"
+version = "0.1.0"
+description = "A bot who wants to bully you"
+authors = ["Ramya <ramyalakshmi.ks@gmail.com>"]
+license = "MIT"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.poetry.dependencies]
+python = ">=3.11"
+streamlit="^1.40.0"
+transformers="^4.46"
+torch="^2.5"
+
+[tool.poetry.scripts]
+app = "run_app:main"
