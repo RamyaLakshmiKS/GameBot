@@ -18,10 +18,15 @@ def main():
     if "history" not in st.session_state:
         st.session_state["history"] = []
 
-    # User input
-    user_input = st.text_input("You:", "")
+    for message in st.session_state.history:
+        with st.chat_message(message["role"]):
+            st.markdown(message["text"])
 
-    if st.button("Send") and user_input:
+    if user_input := st.chat_input("Let's prompt"):
+        st.session_state.history.append({"role": "user", "text": user_input})
+        with st.chat_message("user"):
+            st.markdown(user_input)
+
         # Tokenize and generate response
         input_ids = tokenizer.encode(
             user_input + tokenizer.eos_token, return_tensors="pt"
@@ -29,8 +34,19 @@ def main():
 
         # Concatenate with history if exists
         bot_input_ids = (
-            torch.cat([st.session_state["history"], input_ids], dim=-1)
-            if st.session_state["history"]
+            torch.cat(
+                [
+                    torch.tensor(
+                        tokenizer.encode(
+                            m["text"] + tokenizer.eos_token, return_tensors="pt"
+                        )
+                    )
+                    for m in st.session_state.history
+                    if m["role"] == "user"
+                ],
+                dim=-1,
+            )
+            if st.session_state.history
             else input_ids
         )
 
@@ -41,11 +57,9 @@ def main():
             response_ids[:, bot_input_ids.shape[-1] :][0], skip_special_tokens=True
         )
 
-        # Update session state
-        st.session_state["history"] = response_ids
-
-        # Display response
-        st.text_area("Bot:", value=response, height=100, max_chars=None, key=None)
+        with st.chat_message("assistant"):
+            st.markdown(response)
+        st.session_state.history.append({"role": "assistant", "text": response})
 
 
 if __name__ == "__main__":
