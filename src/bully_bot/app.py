@@ -49,8 +49,8 @@ class BullsAndCows:
         Returns:
             list: A list of up to 2 suggested guesses or an empty list.
         """
-        if len(self.possible_combinations) >= 2:
-            return random.sample(self.possible_combinations, 2)  # Pick 2 random guesses
+        if len(self.possible_combinations) >= 1:
+            return random.sample(self.possible_combinations, 1)  # Pick 2 random guesses
         return []  # No suggestions if fewer than 2 possibilities
 
 
@@ -140,13 +140,15 @@ def main():
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # Plot the entropy graph
+    # Plot the entropy graph on the sidebar
     if st.session_state.entropy_history:
-        st.subheader("Entropy Progress")
-        st.line_chart(
+        st.sidebar.subheader("Entropy Progress")
+        st.sidebar.line_chart(
             {
-                "Entropy": st.session_state.entropy_history,
-            }
+                "Entropy (bits)": st.session_state.entropy_history,
+            },
+            x_label="Number of Guesses",
+            y_label="Entropy (bits)",
         )
 
     # Restart button
