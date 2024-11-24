@@ -1,3 +1,9 @@
 # python stuff
 .venv
 **__pycache__**
+.vscode**
+build/
+**.egg-info**
+.streamlit/
+dist/**
+.DS_Store

@@ -10,10 +10,8 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.poetry.dependencies]
-python = ">=3.11"
-streamlit="^1.40.0"
-transformers="^4.46"
-torch="^2.5"
+python = ">=3.11,<4.0"
+streamlit = ">=1.40.0"
 
 [tool.poetry.scripts]
 app = "run_app:main"
