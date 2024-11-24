@@ -45,12 +45,12 @@ class BullsAndCows:
 
     def suggest_next_guesses(self):
         """
-        Suggest up to 3 guesses from the remaining possibilities.
+        Suggest up to 2 guesses from the remaining possibilities.
         Returns:
-            list: A list of up to 3 suggested guesses or an empty list.
+            list: A list of up to 2 suggested guesses or an empty list.
         """
-        if len(self.possible_combinations) >= 3:
-            return random.sample(self.possible_combinations, 3)  # Pick 3 random guesses
+        if len(self.possible_combinations) >= 2:
+            return random.sample(self.possible_combinations, 2)  # Pick 2 random guesses
         return []  # No suggestions if fewer than 2 possibilities
 
 
@@ -69,6 +69,10 @@ def main():
         st.session_state.game = BullsAndCows()
     if "messages" not in st.session_state:
         st.session_state.messages = []  # Store chat messages
+    if "entropy_history" not in st.session_state:
+        st.session_state.entropy_history = [
+            st.session_state.game.calculate_entropy()
+        ]  # Track entropy values
     if "game_over" not in st.session_state:
         st.session_state.game_over = False
 
@@ -101,6 +105,10 @@ def main():
                 bulls, cows = game.get_feedback(guess)
                 game.update_possibilities(guess, bulls, cows)
 
+                # Calculate entropy and update history
+                entropy = game.calculate_entropy()
+                st.session_state.entropy_history.append(entropy)
+
                 # Check win condition
                 if bulls == 4:
                     st.session_state.messages.append(
@@ -112,7 +120,6 @@ def main():
                     st.session_state.game_over = True
                 else:
                     # Display feedback and suggestions
-                    entropy = game.calculate_entropy()
                     suggestions = game.suggest_next_guesses()
                     feedback = (
                         f"Bulls: {bulls}, Cows: {cows}\nEntropy: {entropy:.2f} bits"
@@ -133,10 +140,20 @@ def main():
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
+    # Plot the entropy graph
+    if st.session_state.entropy_history:
+        st.subheader("Entropy Progress")
+        st.line_chart(
+            {
+                "Entropy": st.session_state.entropy_history,
+            }
+        )
+
     # Restart button
     if st.button("Restart Game"):
         st.session_state.game = BullsAndCows()
         st.session_state.messages = []
+        st.session_state.entropy_history = [st.session_state.game.calculate_entropy()]
         st.session_state.game_over = False
 
 
