@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "bully-bot"
+name = "Cowculator"
 version = "0.1.0"
 description = "A bot who wants to play Bulls and Cows with you!"
 authors = ["Ramya <ramyalakshmi.ks@gmail.com>"]
