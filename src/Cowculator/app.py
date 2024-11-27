@@ -1,8 +1,7 @@
-leaimport random
+import random
 import math
 from itertools import permutations
 import streamlit as st
-
 
 class BullsAndCows:
     """
@@ -53,8 +52,8 @@ class BullsAndCows:
             list: A list of up to 2 suggested guesses or an empty list.
         """
         if len(self.possible_combinations) >= 1:
-            return random.sample(self.possible_combinations, 1)  # Pick 2 random guesses
-        return []  # No suggestions if fewer than 2 possibilities
+            return random.sample(self.possible_combinations, 1)  # Pick 1 random guess
+        return []  # No suggestions if fewer than 1 possibility
 
 
 def main():
@@ -116,6 +115,7 @@ def main():
                 # Append entropy and mutual information to session state
                 st.session_state.entropy_history.append(entropy)
                 st.session_state.mutual_info_history.append(mutual_info)
+                
                 # Check win condition
                 if bulls == 4:
                     st.session_state.messages.append(
@@ -126,18 +126,27 @@ def main():
                     )
                     st.session_state.game_over = True
                 else:
-                    # Display feedback and suggestions
+                    # Display feedback and suggestions with entropy and mutual information in a table
                     suggestions = game.suggest_next_guesses()
-                    feedback = (
-                        f"Bulls: {bulls}, Cows: {cows} <br> Entropy: {entropy:.2f} bits"
-                    )
+                    feedback = f"""
+                    Bulls: {bulls}, Cows: {cows} <br><br>
+                    **Game Metrics:**<br>
+                    <table>
+                        <tr><th>Metric</th><th>Value</th></tr>
+                        <tr><td>Entropy</td><td>{entropy:.2f} bits</td></tr>
+                        <tr><td>Mutual Information</td><td>{mutual_info:.2f} bits</td></tr>
+                    </table>
+                    """
+
+                    # Add suggestions if available
                     if suggestions:
-                        feedback += "<br>Suggested next guesses: "
-                        feedback += "\n".join(
+                        feedback += "<br><br>**Suggested next guesses:**<br>"
+                        feedback += "<br>".join(
                             f"**{''.join(map(str, s))}**" for s in suggestions
                         )
                     else:
-                        feedback += "\nNo suggestions available."
+                        feedback += "<br>No suggestions available."
+
                     st.session_state.messages.append(
                         {"role": "assistant", "content": feedback}
                     )
@@ -151,26 +160,25 @@ def main():
     if st.session_state.entropy_history:
         st.sidebar.subheader("Entropy Progress")
         st.sidebar.line_chart(
-            {"Entropy (bits)": st.session_state.entropy_history,},
-            x_label="Number of Guesses",
-            y_label="Entropy (bits)")
+            {"Entropy (bits)": st.session_state.entropy_history}
+        )
         current_entropy = st.session_state.entropy_history[-1]
         st.sidebar.write(f"**Current Entropy:** {current_entropy:.2f} bits")
     
     if st.session_state.mutual_info_history:
-        st.sidebar.subheader("Mutual Information Chart Progress")
+        st.sidebar.subheader("Mutual Information Progress")
         st.sidebar.line_chart(
-            {"Mutual Information (bits)": st.session_state.mutual_info_history},
-            x_label="Number of Guesses",
-            y_label="Mutual Information (bits)")
-        current_Mutual_info = st.session_state.mutual_info_history[-1]
-        st.sidebar.write(f"**Current Mutual Information:** {current_Mutual_info:.2f} bits")
+            {"Mutual Information (bits)": st.session_state.mutual_info_history}
+        )
+        current_mutual_info = st.session_state.mutual_info_history[-1]
+        st.sidebar.write(f"**Current Mutual Information:** {current_mutual_info:.2f} bits")
 
     # Restart button
     if st.button("Restart Game"):
         st.session_state.game = BullsAndCows()
         st.session_state.messages = []
         st.session_state.entropy_history = [st.session_state.game.calculate_entropy()]
+        st.session_state.mutual_info_history = [0]
         st.session_state.game_over = False
 
 
