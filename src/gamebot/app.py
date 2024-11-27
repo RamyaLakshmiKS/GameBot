@@ -56,6 +56,10 @@ class BullsAndCows:
 
 def main():
     # Streamlit App
+    st.set_page_config(
+        page_icon="https://cdn-icons-png.flaticon.com/512/6100/6100585.png",
+        page_title="Ramya's game bot"
+    )
     st.title("Bulls and Cows")
     st.text(
         "In this game, you need to guess a 4-digit number with all unique digits. "
