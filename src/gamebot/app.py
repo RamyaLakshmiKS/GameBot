@@ -26,7 +26,7 @@ class BullsAndCows:
         )  # entropy calculation
         return entropy
 
-    def calculate_mutual_information(self, prev_entropy, current_entropy):
+    def entropy_reduction(self, prev_entropy, current_entropy):
         return prev_entropy - current_entropy
 
     def get_feedback(self, guess, code=None):
@@ -75,8 +75,8 @@ def main():
         st.session_state.messages = []  # Store chat messages
     if "entropy_history" not in st.session_state:
         st.session_state.entropy_history = [st.session_state.game.calculate_entropy()]  # Track entropy values
-    if "mutual_info_history" not in st.session_state:
-        st.session_state.mutual_info_history = [0]
+    if "entropy_reduction_history" not in st.session_state:
+        st.session_state.entropy_reduction_history = [0]
     if "game_over" not in st.session_state:
         st.session_state.game_over = False
 
@@ -112,11 +112,11 @@ def main():
 
                 # Calculate entropy and update history
                 entropy = game.calculate_entropy()
-                mutual_info = game.calculate_mutual_information(prev_entropy, entropy)
+                entropy_reduction = game.entropy_reduction(prev_entropy, entropy)
 
                 # Append entropy and mutual information to session state
                 st.session_state.entropy_history.append(entropy)
-                st.session_state.mutual_info_history.append(mutual_info)
+                st.session_state.entropy_reduction_history.append(entropy_reduction)
                 
                 # Check win condition
                 if bulls == 4:
@@ -136,7 +136,7 @@ def main():
                     <table>
                         <tr><th>Metric</th><th>Value</th></tr>
                         <tr><td>Entropy</td><td>{entropy:.2f} bits</td></tr>
-                        <tr><td>Mutual Information</td><td>{mutual_info:.2f} bits</td></tr>
+                        <tr><td>Entropy Reduction</td><td>{entropy_reduction:.2f} bits</td></tr>
                     </table>
                     """
 
@@ -169,22 +169,22 @@ def main():
         current_entropy = st.session_state.entropy_history[-1]
         st.sidebar.write(f"**Current Entropy:** {current_entropy:.2f} bits")
     
-    if st.session_state.mutual_info_history:
-        st.sidebar.subheader("Mutual Information Progress")
+    if st.session_state.entropy_reduction_history:
+        st.sidebar.subheader("Entropy Reduction Progress")
         st.sidebar.line_chart(
-            {"Mutual Information (bits)": st.session_state.mutual_info_history},
+            {"Entropy Reduction": st.session_state.entropy_reduction_history},
             x_label="Number of Guesses",
-            y_label="Mutual Information (bits)",
+            y_label="Entropy Reduction",
         )
-        current_mutual_info = st.session_state.mutual_info_history[-1]
-        st.sidebar.write(f"**Current Mutual Information:** {current_mutual_info:.2f} bits")
+        current_entropy_reduce = st.session_state.entropy_reduction_history[-1]
+        st.sidebar.write(f"**Current Entropy Reduction:** {current_entropy_reduce:.2f}")
 
     # Restart button
     if st.button("Restart Game"):
         st.session_state.game = BullsAndCows()
         st.session_state.messages = []
         st.session_state.entropy_history = [st.session_state.game.calculate_entropy()]
-        st.session_state.mutual_info_history = [0]
+        st.session_state.entropy_reduction_history = [0]
         st.session_state.game_over = False
 
 
