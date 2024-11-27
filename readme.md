@@ -1,3 +1,5 @@
+## :point_right: Try this game at this [link](https://bncbot.streamlit.app/) :point_left:
+
 ## How to run this project locally
 
 ### Things required to run this app locally
