@@ -1,4 +1,4 @@
-import random
+leaimport random
 import math
 from itertools import permutations
 import streamlit as st
@@ -73,9 +73,7 @@ def main():
     if "messages" not in st.session_state:
         st.session_state.messages = []  # Store chat messages
     if "entropy_history" not in st.session_state:
-        st.session_state.entropy_history = [
-            st.session_state.game.calculate_entropy()
-        ]  # Track entropy values
+        st.session_state.entropy_history = [st.session_state.game.calculate_entropy()]  # Track entropy values
     if "mutual_info_history" not in st.session_state:
         st.session_state.mutual_info_history = [0]
     if "game_over" not in st.session_state:
@@ -131,10 +129,10 @@ def main():
                     # Display feedback and suggestions
                     suggestions = game.suggest_next_guesses()
                     feedback = (
-                        f"Bulls: {bulls}, Cows: {cows}\nEntropy: {entropy:.2f} bits"
+                        f"Bulls: {bulls}, Cows: {cows} <br> Entropy: {entropy:.2f} bits"
                     )
                     if suggestions:
-                        feedback += "\nSuggested next guesses:\n"
+                        feedback += "<br>Suggested next guesses: "
                         feedback += "\n".join(
                             f"**{''.join(map(str, s))}**" for s in suggestions
                         )
@@ -147,18 +145,15 @@ def main():
     # Display chat history AFTER processing user input
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+            st.markdown(message["content"], unsafe_allow_html=True)
 
     # Plot the entropy graph on the sidebar
     if st.session_state.entropy_history:
         st.sidebar.subheader("Entropy Progress")
         st.sidebar.line_chart(
-            {
-                "Entropy (bits)": st.session_state.entropy_history,
-            },
+            {"Entropy (bits)": st.session_state.entropy_history,},
             x_label="Number of Guesses",
-            y_label="Entropy (bits)",
-        )
+            y_label="Entropy (bits)")
         current_entropy = st.session_state.entropy_history[-1]
         st.sidebar.write(f"**Current Entropy:** {current_entropy:.2f} bits")
     
@@ -168,9 +163,8 @@ def main():
             {"Mutual Information (bits)": st.session_state.mutual_info_history},
             x_label="Number of Guesses",
             y_label="Mutual Information (bits)")
-            # Display the current mutual information value
-        current_mutual_info = st.session_state.mutual_info_history[-1]
-        st.sidebar.write(f"**Current Mutual Information:** {current_mutual_info:.2f} bits")
+        current_Mutual_info = st.session_state.mutual_info_history[-1]
+        st.sidebar.write(f"**Current Mutual Information:** {current_Mutual_info:.2f} bits")
 
     # Restart button
     if st.button("Restart Game"):
