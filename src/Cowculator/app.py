@@ -13,10 +13,9 @@ class BullsAndCows:
         self.digits = list(range(10))
         self.secret = random.sample(self.digits, 4)  # Secret number (4 unique digits)
         self.attempts = 0
-        self.possible_combinations = list(
-            permutations(range(10), 4)
-        )  # All possible guesses
-
+        self.possible_combinations = list(permutations(range(10), 4))  # All possible guesses
+        self.first_attempt = True
+        
     def calculate_entropy(self):
         n = len(self.possible_combinations)
         if n == 0:
@@ -47,13 +46,12 @@ class BullsAndCows:
 
     def suggest_next_guesses(self):
         """
-        Suggest up to 2 guesses from the remaining possibilities.
+        Suggest up to 10 guesses from the remaining possibilities.
         Returns:
-            list: A list of up to 2 suggested guesses or an empty list.
+            list: A list of up to 10 suggested guesses or an empty list.
         """
-        if len(self.possible_combinations) >= 1:
-            return random.sample(self.possible_combinations, 1)  # Pick 1 random guess
-        return []  # No suggestions if fewer than 1 possibility
+        sample_size = min(10, len(self.possible_combinations))  # Ensure up to 10 guesses
+        return random.sample(self.possible_combinations, sample_size) if self.possible_combinations else []  
 
 
 def main():
@@ -140,9 +138,9 @@ def main():
 
                     # Add suggestions if available
                     if suggestions:
-                        feedback += "<br><br>**Suggested next guesses:**<br>"
-                        feedback += "<br>".join(
-                            f"**{''.join(map(str, s))}**" for s in suggestions
+                        feedback += "Suggested next guesses:<br>"
+                        feedback += ", ".join(
+                            f"{''.join(map(str, s))}" for s in suggestions
                         )
                     else:
                         feedback += "<br>No suggestions available."
@@ -160,7 +158,9 @@ def main():
     if st.session_state.entropy_history:
         st.sidebar.subheader("Entropy Progress")
         st.sidebar.line_chart(
-            {"Entropy (bits)": st.session_state.entropy_history}
+            {"Entropy (bits)": st.session_state.entropy_history},
+            x_label="Number of Guesses",
+            y_label="Entropy (bits)",
         )
         current_entropy = st.session_state.entropy_history[-1]
         st.sidebar.write(f"**Current Entropy:** {current_entropy:.2f} bits")
@@ -168,7 +168,9 @@ def main():
     if st.session_state.mutual_info_history:
         st.sidebar.subheader("Mutual Information Progress")
         st.sidebar.line_chart(
-            {"Mutual Information (bits)": st.session_state.mutual_info_history}
+            {"Mutual Information (bits)": st.session_state.mutual_info_history},
+            x_label="Number of Guesses",
+            y_label="Mutual Information (bits)",
         )
         current_mutual_info = st.session_state.mutual_info_history[-1]
         st.sidebar.write(f"**Current Mutual Information:** {current_mutual_info:.2f} bits")
