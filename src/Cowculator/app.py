@@ -159,6 +159,8 @@ def main():
             x_label="Number of Guesses",
             y_label="Entropy (bits)",
         )
+        current_entropy = st.session_state.entropy_history[-1]
+        st.sidebar.write(f"**Current Entropy:** {current_entropy:.2f} bits")
     
     if st.session_state.mutual_info_history:
         st.sidebar.subheader("Mutual Information Chart Progress")
@@ -166,6 +168,9 @@ def main():
             {"Mutual Information (bits)": st.session_state.mutual_info_history},
             x_label="Number of Guesses",
             y_label="Mutual Information (bits)")
+            # Display the current mutual information value
+        current_mutual_info = st.session_state.mutual_info_history[-1]
+        st.sidebar.write(f"**Current Mutual Information:** {current_mutual_info:.2f} bits")
 
     # Restart button
     if st.button("Restart Game"):
