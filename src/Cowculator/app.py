@@ -28,6 +28,9 @@ class BullsAndCows:
         )  # entropy calculation
         return entropy
 
+    def calculate_mutual_information(self, prev_entropy, current_entropy):
+        return prev_entropy - current_entropy
+
     def get_feedback(self, guess, code=None):
         if code is None:
             code = self.secret
@@ -73,6 +76,8 @@ def main():
         st.session_state.entropy_history = [
             st.session_state.game.calculate_entropy()
         ]  # Track entropy values
+    if "mutual_info_history" not in st.session_state:
+        st.session_state.mutual_info_history = [0]
     if "game_over" not in st.session_state:
         st.session_state.game_over = False
 
@@ -101,14 +106,18 @@ def main():
             else:
                 # Valid input: Process guess
                 guess = [int(x) for x in user_input]
+                prev_entropy = st.session_state.entropy_history[-1] 
                 game.attempts += 1
                 bulls, cows = game.get_feedback(guess)
                 game.update_possibilities(guess, bulls, cows)
 
                 # Calculate entropy and update history
                 entropy = game.calculate_entropy()
-                st.session_state.entropy_history.append(entropy)
+                mutual_info = game.calculate_mutual_information(prev_entropy, entropy)
 
+                # Append entropy and mutual information to session state
+                st.session_state.entropy_history.append(entropy)
+                st.session_state.mutual_info_history.append(mutual_info)
                 # Check win condition
                 if bulls == 4:
                     st.session_state.messages.append(
@@ -150,6 +159,13 @@ def main():
             x_label="Number of Guesses",
             y_label="Entropy (bits)",
         )
+    
+    if st.session_state.mutual_info_history:
+        st.sidebar.subheader("Mutual Information Chart Progress")
+        st.sidebar.line_chart(
+            {"Mutual Information (bits)": st.session_state.mutual_info_history},
+            x_label="Number of Guesses",
+            y_label="Mutual Information (bits)")
 
     # Restart button
     if st.button("Restart Game"):
